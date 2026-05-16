@@ -6,6 +6,7 @@
   border-radius: 15px;
   transition: background-color 0.3s ease, color 0.3s ease, border 0.3s ease;
   border: 1px solid #CCCCCC; /* borde visible en modo claro */
+  animation: Aparecer 1.5s
 }
 
 .dark-mode .ToDo {
@@ -33,15 +34,6 @@ input:focus {
   border: 1px solid #ccc;
 }
 
-li {
-  list-style-type: none;
-  display: flex;
-  align-items: center;
-  margin: 10px 0 10px 0;
-  color: inherit;
-  font-size: 18px;
-}
-
 li > input {
   width: 20px;
   min-width: 20px;
@@ -55,7 +47,7 @@ li > input[type="checkbox"] {
 }
 
 li > span {
-  cursor: grab;
+  cursor: default; /* Cursor de flecha normal */
   flex: 1;
   white-space: normal;
   word-wrap: break-word;
@@ -64,11 +56,6 @@ li > span {
   margin: 10px 0 10px 0;
 }
 
-li > span:active {
-  cursor: grabbing;
-}
-
-ul, li, .ToDo { cursor: inherit; }
 
 li > button {
   margin-left: auto;
@@ -88,8 +75,89 @@ ul {
   position: fixed;
   top: 15px;
   right: 15px;
-  background: transparent;
+  border-radius: 16px;
   border: none;
   font-size: 22px;
   cursor: pointer;
+  padding: 1px 1px 2px 1px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+.light-mode .toggle-theme-btn {
+  background: #1E1E1E; 
+  color: #FFFFFF;      
+}
+
+.dark-mode .toggle-theme-btn {
+  background: #FFFFFF; 
+  color: #1E1E1E;      
+}
+
+@keyframes Aparecer {
+  
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 100;
+  }
+
+}
+
+/* Animación para cada item de la lista */
+.task-item {
+  animation: slideInFade 0.4s ease-out forwards;
+}
+
+@keyframes slideInFade {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px); /* Empieza 20px más arriba */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0); /* Termina en su posición original */
+  }
+}
+
+/* Deja tu estilo de li como lo tenías originalmente */
+li {
+  list-style-type: none;
+  display: flex;
+  align-items: center;
+  margin: 10px 0 10px 0;
+  color: inherit;
+  font-size: 18px;
+}
+
+/* Animación de Entrada: Aparece difuminado y baja levemente */
+.task-item {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animación de Salida: Solo se difumina hasta desaparecer en su lugar */
+.task-item-exit {
+  animation: fadeOut 0.25s ease-in forwards;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+

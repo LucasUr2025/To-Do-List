@@ -5,8 +5,7 @@ import './index.css'
 function App() {
   const [tasks, setTasks] = useState([])
   const [newTask, setNewTask] = useState('')
-  const [draggedIndex, setDraggedIndex] = useState(null)
-  const [darkMode, setDarkMode] = useState(false)
+  const [darkMode, setDarkMode] = useState(true)
 
   useEffect(() => {
     document.body.className = darkMode ? 'dark-mode' : 'light-mode'
@@ -14,7 +13,7 @@ function App() {
 
   const addTask = () => {
     if (newTask.trim() !== '') {
-      setTasks([...tasks, { text: newTask, done: false }])
+      setTasks([...tasks, { id: Date.now(), text: newTask, done: false, isDeleting: false }])
       setNewTask('')
     }
   }
@@ -25,72 +24,59 @@ function App() {
     }
   }
 
-  const toggleTask = (index) => {
-    const updatedTasks = [...tasks]
-    updatedTasks[index].done = !updatedTasks[index].done
+  const toggleTask = (id) => {
+    const updatedTasks = tasks.map(task => 
+      task.id === id ? { ...task, done: !task.done } : task
+    )
     setTasks(updatedTasks)
   }
 
-  const deleteTask = (index) => {
-    const updatedTasks = tasks.filter((_, i) => i !== index)
-    setTasks(updatedTasks)
-  }
+  const deleteTask = (id) => {
+    // 1. Activamos la clase de desvanecimiento
+    setTasks(tasks.map(task => 
+      task.id === id ? { ...task, isDeleting: true } : task
+    ))
 
-  const handleDragStart = (index) => {
-    setDraggedIndex(index)
-  }
-
-  const handleDragOver = (e) => {
-    e.preventDefault()
-  }
-
-  const handleDrop = (index) => {
-    if (draggedIndex === null || tasks.length < 2) return
-    const updatedTasks = [...tasks]
-    const [movedTask] = updatedTasks.splice(draggedIndex, 1)
-    updatedTasks.splice(index, 0, movedTask)
-    setTasks(updatedTasks)
-    setDraggedIndex(null)
+    // 2. Esperamos 250ms a que termine la animación antes de borrar el item del estado
+    setTimeout(() => {
+      setTasks(currentTasks => currentTasks.filter(task => task.id !== id))
+    }, 250);
   }
 
   return (
     <>
-      {/* Botón flotante */}
       <button 
         className="toggle-theme-btn" 
         onClick={() => setDarkMode(!darkMode)}
       >
         {darkMode ? '☀️' : '🌙'}
       </button>
-
+      
       <div className='ToDo'>
         <h1>To-Do List</h1>
         <input
           type="text"
           placeholder="Add a new task..."
-          maxlength="105"
+          maxLength="105"
           value={newTask}
           onChange={(e) => setNewTask(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyPress}
         />
         <ul>
-          {tasks.map((task, index) => (
-            <li
-              key={index}
-              draggable={tasks.length > 1}
-              onDragStart={() => handleDragStart(index)}
-              onDragOver={handleDragOver}
-              onDrop={() => handleDrop(index)}
+          {tasks.map((task) => (
+            <li 
+              key={task.id} 
+              className={`task-item ${task.isDeleting ? 'task-item-exit' : ''}`}
             >
               <input
                 type="checkbox"
                 checked={task.done}
-                onChange={() => toggleTask(index)}
+                onChange={() => toggleTask(task.id)}
               />
               <span style={{ textDecoration: task.done ? 'line-through' : 'none' }}>
                 {task.text}
               </span>
-              <button onClick={() => deleteTask(index)}>❌</button>
+              <button onClick={() => deleteTask(task.id)}>❌</button>
             </li>
           ))}
         </ul>
